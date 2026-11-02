@@ -1,0 +1,25 @@
+# Two stateless replicas sharing one Redis: limits are enforced globally,
+# not per instance. Try:  make demo
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      retries: 10
+
+  throttle-a: &throttle
+    build: .
+    environment:
+      THROTTLE_BACKEND: redis
+      THROTTLE_REDIS_ADDR: redis:6379
+      THROTTLE_FAILURE_MODE: local
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports: ["8081:8080"]
+
+  throttle-b:
+    <<: *throttle
+    ports: ["8082:8080"]

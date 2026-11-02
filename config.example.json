@@ -1,0 +1,12 @@
+{
+  "listen_addr": ":8080",
+  "backend": "redis",
+  "redis_addr": "localhost:6379",
+  "redis_timeout": "50ms",
+  "failure_mode": "local",
+  "rules": [
+    { "name": "api-default", "algorithm": "token_bucket",   "limit": 100, "window": "1m", "burst": 20 },
+    { "name": "login",       "algorithm": "sliding_window", "limit": 5,   "window": "1m" },
+    { "name": "search",      "algorithm": "sliding_window", "limit": 30,  "window": "10s" }
+  ]
+}
